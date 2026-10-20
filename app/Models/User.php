@@ -64,6 +64,16 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class);
     }
 
+    public function bookmarks(): HasMany
+    {
+        return $this->hasMany(Bookmark::class);
+    }
+
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class);
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
@@ -82,6 +92,16 @@ class User extends Authenticatable
     public function canPublish(): bool
     {
         return in_array($this->role, ['editor', 'admin'], true);
+    }
+
+    public function roleLabel(): string
+    {
+        return match ($this->role) {
+            'admin' => 'Pemimpin Redaksi',
+            'editor' => 'Editor',
+            'author' => 'Jurnalis',
+            default => 'Kontributor',
+        };
     }
 
     public function avatarUrl(): string

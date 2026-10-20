@@ -10,3 +10,4 @@ Artisan::command('inspire', function () {
 
 Schedule::command('app:publish-scheduled')->everyMinute();
 Schedule::command('app:aggregate-views')->everyFiveMinutes();
+Schedule::command('app:backup-db --keep=7')->dailyAt('02:00');

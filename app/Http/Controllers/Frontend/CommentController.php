@@ -44,7 +44,12 @@ class CommentController extends Controller
     public function report(Request $request, int $id)
     {
         $comment = Comment::findOrFail($id);
-        $comment->update(['status' => 'pending']);
+        $reason = trim((string) $request->string('reason', 'dilaporkan pembaca'));
+        $comment->update([
+            'status' => 'pending',
+            'report_count' => ($comment->report_count ?? 0) + 1,
+            'report_reason' => mb_substr($reason, 0, 500),
+        ]);
 
         Log::info('Komentar dilaporkan', [
             'comment_id' => $comment->id,

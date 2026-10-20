@@ -11,7 +11,7 @@
 <div class="bg-white rounded shadow p-4">
 <h2 class="font-bold mb-3">Menunggu Review</h2>
 <table class="w-full text-sm"><tbody>
-@forelse($latestPending as $p)<tr class="border-t"><td class="py-2"><a class="text-blue-600" href="{{ route('admin.posts.edit', $p) }}">{{ $p->title }}</a><div class="text-xs text-gray-500">{{ $p->author->name ?? '' }} · {{ $p->created_at->diffForHumans() }}</div></td></tr>@empty<tr><td class="py-2 text-gray-500">Tidak ada antrean.</td></tr>@endforelse
+@forelse($latestPending as $p)<tr class="border-t"><td class="py-2"><a class="text-red-700" href="{{ route('admin.posts.edit', $p) }}">{{ $p->title }}</a><div class="text-xs text-gray-500">{{ $p->author->name ?? '' }} · {{ $p->created_at->diffForHumans() }}</div></td></tr>@empty<tr><td class="py-2 text-gray-500">Tidak ada antrean.</td></tr>@endforelse
 </tbody></table>
 </div>
 <div class="bg-white rounded shadow p-4">

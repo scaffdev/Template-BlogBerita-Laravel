@@ -19,6 +19,13 @@
 <label class="block mb-2">Deskripsi default<textarea name="seo_default_description" rows="2" class="mt-1 w-full border rounded px-3 py-2">{{ old('seo_default_description', $settings['seo_default_description']) }}</textarea></label>
 <label class="block">GA4 Measurement ID<input name="ga4_id" value="{{ old('ga4_id', $settings['ga4_id']) }}" placeholder="G-XXXXXXX" class="mt-1 w-full border rounded px-3 py-2 font-mono"></label>
 </fieldset>
+<fieldset><legend class="font-bold mb-2">Kontak Redaksi</legend>
+<div class="grid md:grid-cols-2 gap-2">
+<label class="block">Email redaksi<input type="email" name="site_email" value="{{ old('site_email', $settings['site_email']) }}" class="mt-1 w-full border rounded px-3 py-2" placeholder="redaksi@domain.id"></label>
+<label class="block">Telepon / WhatsApp<input name="site_phone" value="{{ old('site_phone', $settings['site_phone']) }}" class="mt-1 w-full border rounded px-3 py-2" placeholder="(021) 555-0100"></label>
+</div>
+<label class="block mt-2">Alamat kantor<input name="site_address" value="{{ old('site_address', $settings['site_address']) }}" class="mt-1 w-full border rounded px-3 py-2" placeholder="Jl. Contoh No. 1, Jakarta"></label>
+</fieldset>
 <fieldset><legend class="font-bold mb-2">Media Sosial</legend>
 <div class="grid md:grid-cols-2 gap-2">
 <label class="block">Facebook<input name="facebook" value="{{ old('facebook', $settings['facebook']) }}" class="mt-1 w-full border rounded px-3 py-2"></label>
@@ -27,7 +34,7 @@
 <label class="block">YouTube<input name="youtube" value="{{ old('youtube', $settings['youtube']) }}" class="mt-1 w-full border rounded px-3 py-2"></label>
 </div>
 </fieldset>
-<p class="text-xs text-gray-500">Slot iklan dikelola di menu <a class="text-blue-600" href="{{ route('admin.ads.index') }}">Iklan</a>.</p>
-<button class="bg-blue-600 text-white px-4 py-2 rounded">Simpan Pengaturan</button>
+<p class="text-xs text-gray-500">Slot iklan dikelola di menu <a class="text-red-700" href="{{ route('admin.ads.index') }}">Iklan</a>.</p>
+<button class="bg-red-600 text-white px-4 py-2 rounded">Simpan Pengaturan</button>
 </form>
 @endsection

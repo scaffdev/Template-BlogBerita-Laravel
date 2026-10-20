@@ -1,7 +1,11 @@
 @extends('layouts.admin')
 @section('title', 'Statistik')
 @section('content')
-<h1 class="text-xl font-bold mb-4">Statistik</h1>
+<div class="flex flex-wrap items-center gap-2 mb-4">
+<h1 class="text-xl font-bold mr-auto">Statistik</h1>
+<a href="{{ route('admin.analytics.export-posts') }}" class="text-xs font-bold border rounded px-3 py-2 bg-white hover:bg-gray-50">⬇ Export artikel (CSV)</a>
+<a href="{{ route('admin.analytics.export-authors') }}" class="text-xs font-bold border rounded px-3 py-2 bg-white hover:bg-gray-50">⬇ Export penulis (CSV)</a>
+</div>
 <div class="bg-white rounded shadow p-4 mb-4"><h2 class="font-bold mb-2">Trafik 30 Hari</h2><canvas id="chart30" height="90"></canvas></div>
 <div class="grid lg:grid-cols-3 gap-4 mb-4">
 <div class="bg-white rounded shadow p-4"><h2 class="font-bold mb-2">Populer Hari Ini</h2><ol class="text-sm list-decimal ml-5 space-y-1">@foreach($today as $p)<li>{{ $p->title }} <span class="text-gray-500">({{ number_format($p->views_count) }})</span></li>@endforeach</ol></div>

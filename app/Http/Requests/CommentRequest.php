@@ -15,6 +15,7 @@ class CommentRequest extends FormRequest
     {
         $rules = [
             'content' => ['required', 'string', 'min:3', 'max:2000'],
+            'parent_id' => ['nullable', 'integer', 'exists:comments,id'],
         ];
 
         if (! $this->user()) {

@@ -9,6 +9,43 @@ use Illuminate\Support\Str;
 class ImageService
 {
     /**
+     * Alias yang dipakai controller (upload) — return string path relatif.
+     */
+    public function upload(UploadedFile $file, string $dir = 'posts'): string
+    {
+        $out = $this->store($file, $dir);
+
+        return $out['original'];
+    }
+
+    public function delete(?string $path): void
+    {
+        if (! $path) {
+            return;
+        }
+        try {
+            $disk = Storage::disk('public');
+            if ($disk->exists($path)) {
+                $disk->delete($path);
+            }
+            // Hapus turunan thumb/medium/webp dengan basename sama
+            $info = pathinfo($path);
+            $base = preg_replace('/-(thumb|medium)$/', '', $info['filename'] ?? '');
+            if ($base) {
+                foreach ($disk->files($info['dirname'] ?? '.') as $f) {
+                    if (str_contains(basename($f), (string) $base)) {
+                        try {
+                            $disk->delete($f);
+                        } catch (\Throwable $ignored) {
+                        }
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+        }
+    }
+
+    /**
      * Simpan original + thumbnail 300px + medium 800px pakai GD.
      * Return ['original'=>path,'thumbnail'=>..., 'medium'=>...] (path relatif storage public).
      */

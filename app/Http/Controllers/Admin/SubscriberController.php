@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Jobs\SendNewsletterJob;
 use App\Mail\NewsletterMail;
+use App\Models\NewsletterLog;
 use App\Models\Post;
 use App\Models\Subscriber;
 use Illuminate\Http\Request;
@@ -12,7 +13,16 @@ use Illuminate\Support\Facades\Mail;
 
 class SubscriberController extends Controller
 {
-public function destroy(Subscriber $subscriber)
+    public function index()
+    {
+        $subscribers = Subscriber::latest()->paginate(30);
+        $total = Subscriber::count();
+        $confirmed = Subscriber::where('is_confirmed', true)->whereNull('unsubscribed_at')->count();
+
+        return view('admin.subscribers.index', compact('subscribers', 'total', 'confirmed'));
+    }
+
+    public function destroy(Subscriber $subscriber)
     {
         $subscriber->delete();
 
@@ -40,6 +50,16 @@ public function destroy(Subscriber $subscriber)
 
         // Diproses via job (queue sync = langsung jalan bila queue=sync)
         SendNewsletterJob::dispatch($data['subject'], $posts->pluck('id')->all(), $data['body'] ?? null);
+
+        try {
+            NewsletterLog::create([
+                'subject' => $data['subject'],
+                'body' => $data['body'] ?? null,
+                'recipients_count' => Subscriber::where('is_confirmed', true)->whereNull('unsubscribed_at')->count(),
+                'created_by' => auth()->id(),
+            ]);
+        } catch (\Throwable $e) {
+        }
 
         // Fallback langsung bila queue sync belum worker: kirim sinkron ke confirmed
         if (config('queue.default') === 'sync') {

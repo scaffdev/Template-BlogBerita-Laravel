@@ -11,7 +11,7 @@ class SettingController extends Controller
 {
     public function edit()
     {
-        $keys = ['site_name', 'site_tagline', 'seo_default_title', 'seo_default_description', 'facebook', 'twitter', 'instagram', 'youtube', 'ga4_id', 'logo', 'favicon', 'comments_moderation', 'comments_enabled'];
+        $keys = ['site_name', 'site_tagline', 'seo_default_title', 'seo_default_description', 'facebook', 'twitter', 'instagram', 'youtube', 'ga4_id', 'logo', 'favicon', 'site_email', 'site_phone', 'site_address', 'comments_moderation', 'comments_enabled'];
         $settings = [];
         foreach ($keys as $k) {
             $settings[$k] = Setting::get($k, '');
@@ -32,13 +32,17 @@ class SettingController extends Controller
             'instagram' => ['nullable', 'url'],
             'youtube' => ['nullable', 'url'],
             'ga4_id' => ['nullable', 'string', 'max:30'],
+            'site_email' => ['nullable', 'email', 'max:150'],
+            'site_phone' => ['nullable', 'string', 'max:50'],
+            'site_address' => ['nullable', 'string', 'max:255'],
             'logo' => ['nullable', 'image', 'max:2048'],
             'favicon' => ['nullable', 'image', 'max:1024'],
             'comments_moderation' => ['nullable', 'boolean'],
             'comments_enabled' => ['nullable', 'boolean'],
         ]);
         foreach (['site_name', 'site_tagline', 'seo_default_title', 'seo_default_description',
-            'facebook', 'twitter', 'instagram', 'youtube', 'ga4_id'] as $k) {
+            'facebook', 'twitter', 'instagram', 'youtube', 'ga4_id',
+            'site_email', 'site_phone', 'site_address'] as $k) {
             Setting::set($k, (string) ($data[$k] ?? ''));
         }
         Setting::set('comments_moderation', $request->boolean('comments_moderation') ? '1' : '0');

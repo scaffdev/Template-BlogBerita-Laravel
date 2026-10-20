@@ -11,6 +11,6 @@
 <textarea name="{{ $slot }}" rows="4" class="w-full border rounded px-3 py-2 font-mono text-xs" placeholder="Paste kode AdSense / HTML banner di sini…">{{ $ads[$slot] ?? '' }}</textarea>
 </div>
 @endforeach
-<button class="bg-blue-600 text-white px-4 py-2 rounded text-sm">Simpan Iklan</button>
+<button class="bg-red-600 text-white px-4 py-2 rounded text-sm">Simpan Iklan</button>
 </form>
 @endsection

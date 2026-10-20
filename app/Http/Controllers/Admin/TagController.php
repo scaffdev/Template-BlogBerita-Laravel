@@ -9,7 +9,14 @@ use Illuminate\Support\Str;
 
 class TagController extends Controller
 {
-public function store(Request $request)
+    public function index()
+    {
+        $tags = Tag::withCount('posts')->orderBy('name')->paginate(50);
+
+        return view('admin.tags.index', compact('tags'));
+    }
+
+    public function store(Request $request)
     {
         $data = $request->validate(['name' => ['required', 'string', 'max:60', 'unique:tags,name']]);
         Tag::create(['name' => $data['name'], 'slug' => Str::slug($data['name'])]);

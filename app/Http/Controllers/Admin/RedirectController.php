@@ -8,7 +8,14 @@ use Illuminate\Http\Request;
 
 class RedirectController extends Controller
 {
-public function store(Request $request)
+    public function index()
+    {
+        $redirects = Redirect::latest()->paginate(50);
+
+        return view('admin.redirects.index', compact('redirects'));
+    }
+
+    public function store(Request $request)
     {
         $data = $request->validate([
             'from_slug' => ['required', 'string', 'max:255', 'unique:redirects,from_slug'],

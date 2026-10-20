@@ -10,7 +10,7 @@
 <input name="caption" placeholder="Keterangan" class="border rounded px-3 py-2">
 <input name="credit" placeholder="Kredit/sumber foto" class="border rounded px-3 py-2">
 </div>
-<button class="mt-2 bg-blue-600 text-white px-4 py-2 rounded">Upload</button>
+<button class="mt-2 bg-red-600 text-white px-4 py-2 rounded">Upload</button>
 </form>
 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
 @foreach($media as $m)
@@ -19,7 +19,7 @@
 <div class="p-2">
 <div class="font-mono truncate">{{ basename($m->file_name) }}</div>
 <div class="text-gray-500 truncate">{{ $m->alt_text ?: '— tanpa alt —' }}</div>
-<button onclick="document.getElementById('m{{ $m->id }}').classList.toggle('hidden')" class="text-blue-600 mt-1">Edit alt/caption</button>
+<button onclick="document.getElementById('m{{ $m->id }}').classList.toggle('hidden')" class="text-red-700 mt-1">Edit alt/caption</button>
 <form id="m{{ $m->id }}" method="POST" action="{{ route('admin.media.update', $m) }}" class="hidden mt-2 space-y-1">@csrf @method('PUT')
 <input name="alt_text" value="{{ $m->alt_text }}" placeholder="Alt" class="w-full border rounded px-2 py-1">
 <input name="caption" value="{{ $m->caption }}" placeholder="Caption" class="w-full border rounded px-2 py-1">

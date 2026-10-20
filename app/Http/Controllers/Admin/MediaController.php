@@ -9,7 +9,14 @@ use Illuminate\Http\Request;
 
 class MediaController extends Controller
 {
-public function store(Request $request, ImageService $images)
+    public function index()
+    {
+        $media = Media::latest()->paginate(24);
+
+        return view('admin.media.index', compact('media'));
+    }
+
+    public function store(Request $request, ImageService $images)
     {
         $request->validate([
             'files' => ['required', 'array'],

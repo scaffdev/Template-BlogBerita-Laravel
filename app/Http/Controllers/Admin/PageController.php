@@ -9,7 +9,14 @@ use Illuminate\Support\Str;
 
 class PageController extends Controller
 {
-public function create()
+    public function index()
+    {
+        $pages = Page::orderBy('title')->paginate(30);
+
+        return view('admin.pages.index', compact('pages'));
+    }
+
+    public function create()
     {
         return view('admin.pages.form', ['page' => new Page(['status' => 'published'])]);
     }

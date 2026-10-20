@@ -7,12 +7,13 @@ use App\Models\Category;
 use App\Models\Page;
 use App\Models\Post;
 use App\Models\Tag;
+use Illuminate\Support\Facades\Cache;
 
 class FeedController extends Controller
 {
     public function feed()
     {
-        $posts = Post::published()->recent()->with(['author', 'category'])->take(20)->get();
+        $posts = Cache::remember('feed_rss', 600, fn () => Post::published()->recent()->with(['author', 'category'])->take(20)->get());
 
         return response()->view('feed.rss', compact('posts'), 200, [
             'Content-Type' => 'application/rss+xml; charset=UTF-8',
@@ -21,7 +22,7 @@ class FeedController extends Controller
 
     public function sitemap()
     {
-        $posts = Post::published()->recent()->take(1000)->get(['slug', 'updated_at']);
+        $posts = Cache::remember('sitemap_posts', 600, fn () => Post::published()->recent()->take(1000)->get(['slug', 'updated_at']));
         $categories = Category::all(['slug', 'updated_at']);
         $tags = Tag::all(['slug']);
         $pages = class_exists(Page::class)

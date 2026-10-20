@@ -9,7 +9,14 @@ use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
-public function create()
+    public function index()
+    {
+        $categories = Category::with('parent')->withCount('posts')->orderBy('name')->paginate(30);
+
+        return view('admin.categories.index', compact('categories'));
+    }
+
+    public function create()
     {
         return view('admin.categories.form', ['category' => new Category(), 'parents' => Category::orderBy('name')->get()]);
     }

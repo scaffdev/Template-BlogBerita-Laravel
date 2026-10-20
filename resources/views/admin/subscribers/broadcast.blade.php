@@ -10,6 +10,6 @@
 <div class="space-y-1 max-h-64 overflow-y-auto border rounded p-2">
 @foreach($posts as $p)<label class="flex gap-2 items-start text-xs"><input type="checkbox" name="post_ids[]" value="{{ $p->id }}" class="mt-1"><span>{{ $p->title }} <span class="text-gray-500">({{ $p->published_at?->format('d M Y') }})</span></span></label>@endforeach
 </div></div>
-<button class="bg-blue-600 text-white px-4 py-2 rounded">Kirim ke antrean</button>
+<button class="bg-red-600 text-white px-4 py-2 rounded">Kirim ke antrean</button>
 </form>
 @endsection

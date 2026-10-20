@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CommentController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ExportController;
+use App\Http\Controllers\Admin\LiveUpdateController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PostController;
@@ -68,6 +70,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:author,editor,
     Route::post('/settings', [SettingController::class, 'update'])->name('settings.update')->middleware('role:admin');
 
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index')->middleware('role:editor,admin');
+    Route::get('/analytics/export-posts', [ExportController::class, 'postsCsv'])->name('analytics.export-posts')->middleware('role:editor,admin');
+    Route::get('/analytics/export-authors', [ExportController::class, 'authorsCsv'])->name('analytics.export-authors')->middleware('role:editor,admin');
+    Route::post('/posts/{post}/live', [LiveUpdateController::class, 'store'])->name('posts.live.store');
+    Route::delete('/live/{update}', [LiveUpdateController::class, 'destroy'])->name('posts.live.destroy');
     Route::get('/activity-log', [ActivityLogController::class, 'index'])->name('activity.index')->middleware('role:admin');
 
     Route::get('/redirects', [RedirectController::class, 'index'])->name('redirects.index')->middleware('role:editor,admin');

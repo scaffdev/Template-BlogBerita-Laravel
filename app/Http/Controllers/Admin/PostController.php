@@ -67,6 +67,7 @@ class PostController extends Controller
     public function store(StorePostRequest $request, ImageService $images)
     {
         $data = $request->validated();
+        $data = $this->normalizeExtra($request, $data);
         $data['slug'] ??= Str::slug($data['title']);
         $data['slug'] = Str::slug($data['slug']);
 
@@ -103,7 +104,7 @@ class PostController extends Controller
         $this->ensureOwnerOrPrivileged($post);
 
         return view('admin.posts.form', [
-            'post' => $post->load('tags'),
+            'post' => $post->load(['tags', 'liveUpdates']),
             'categories' => Category::orderBy('name')->get(),
             'tags' => Tag::orderBy('name')->get(),
         ]);
@@ -114,6 +115,7 @@ class PostController extends Controller
         $this->ensureOwnerOrPrivileged($post);
         $oldSlug = $post->slug;
         $data = $request->validated();
+        $data = $this->normalizeExtra($request, $data);
         $data['slug'] = Str::slug($data['slug'] ?: $data['title']);
 
         if (! $this->canPublish() && in_array($data['status'], ['published', 'archived'], true)) {
@@ -266,6 +268,45 @@ class PostController extends Controller
         $words = str_word_count(strip_tags($html));
 
         return max(1, (int) ceil($words / 200));
+    }
+
+    private function normalizeExtra(Request $request, array $data): array
+    {
+        foreach (['is_headline', 'is_featured', 'allow_comments', 'is_sponsored', 'is_liveblog'] as $b) {
+            $data[$b] = $request->boolean($b, $b === 'allow_comments');
+            if ($b === 'allow_comments' && ! $request->has($b)) {
+                $data[$b] = false;
+            }
+        }
+        if (isset($data['co_authors']) && is_string($data['cons_authors'] ?? null)) {
+            unset($data['cons_authors']);
+        }
+        if (isset($data['co_authors']) && is_string($data['co_authors'])) {
+            $arr = collect(explode(',', $data['co_authors']))->map(fn ($s) => trim($s))->filter()->take(3)->values()->all();
+            $data['co_authors'] = $arr ?: null;
+        }
+        if (empty($data['series_name'])) {
+            $data['series_name'] = null;
+            $data['series_order'] = null;
+        }
+        if (isset($data['summary_points']) && is_string($data['summary_points'])) {
+            $data['summary_points'] = collect(preg_split('/\r\n|\r|\n/', $data['summary_points']))
+                ->map(fn ($s) => trim($s))
+                ->filter()
+                ->take(4)
+                ->values()
+                ->all() ?: null;
+        }
+        if (empty($data['featured_image_credit'])) {
+            $data['featured_image_credit'] = null;
+        }
+        if (empty($data['is_sponsored'])) {
+            $data['sponsored_label'] = null;
+        } elseif (empty($data['sponsored_label'])) {
+            $data['sponsored_label'] = 'Konten Bersponsor';
+        }
+
+        return $data;
     }
 
     private function log(string $desc, ?Post $post): void

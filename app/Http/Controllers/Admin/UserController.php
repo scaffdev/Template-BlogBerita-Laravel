@@ -10,7 +10,14 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-public function create()
+    public function index()
+    {
+        $users = User::withCount('posts')->orderBy('name')->paginate(20);
+
+        return view('admin.users.index', compact('users'));
+    }
+
+    public function create()
     {
         return view('admin.users.form', ['user' => new User(['role' => 'author'])]);
     }

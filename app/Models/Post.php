@@ -16,18 +16,28 @@ class Post extends Model
 
     protected $fillable = [
         'user_id',
+        'co_authors',
         'category_id',
         'title',
         'slug',
+        'series_name',
+        'series_order',
         'excerpt',
+        'summary_points',
         'content',
         'featured_image',
+        'featured_image_credit',
         'status',
         'published_at',
         'views_count',
+        'likes_count',
+        'bookmarks_count',
         'reading_time',
         'is_featured',
         'is_headline',
+        'is_sponsored',
+        'sponsored_label',
+        'is_liveblog',
         'allow_comments',
         'meta_title',
         'meta_description',
@@ -37,10 +47,16 @@ class Post extends Model
     {
         return [
             'published_at' => 'datetime',
+            'co_authors' => 'array',
+            'summary_points' => 'array',
             'is_featured' => 'boolean',
             'is_headline' => 'boolean',
+            'is_sponsored' => 'boolean',
+            'is_liveblog' => 'boolean',
             'allow_comments' => 'boolean',
             'views_count' => 'integer',
+            'likes_count' => 'integer',
+            'bookmarks_count' => 'integer',
             'reading_time' => 'integer',
         ];
     }
@@ -70,6 +86,44 @@ class Post extends Model
         return $this->hasMany(PostRevision::class)->orderByDesc('created_at');
     }
 
+    public function liveUpdates(): HasMany
+    {
+        return $this->hasMany(LiveUpdate::class)->orderByDesc('created_at');
+    }
+
+    public function bookmarks(): HasMany
+    {
+        return $this->hasMany(Bookmark::class);
+    }
+
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    public function seriesPosts(int $limit = 6)
+    {
+        if (empty($this->series_name)) {
+            return collect();
+        }
+
+        return static::published()
+            ->where('series_name', $this->series_name)
+            ->where('id', '!=', $this->id)
+            ->orderBy('series_order')
+            ->orderBy('published_at')
+            ->limit($limit)
+            ->with(['author', 'category'])
+            ->get();
+    }
+
+    public function coAuthorNames(): string
+    {
+        $extra = $this->co_authors ?? [];
+
+        return collect($extra)->filter()->take(3)->join(', ');
+    }
+
     public function scopePublished(Builder $query): Builder
     {
         return $query->where('status', 'published')->where('published_at', '<=', now());
@@ -97,12 +151,40 @@ class Post extends Model
 
     public function scopeSearch(Builder $query, string $q): Builder
     {
-        $like = '%' . $q . '%';
+        return $query->searchSmart($q);
+    }
 
-        return $query->where(function (Builder $inner) use ($like) {
-            $inner->where('title', 'like', $like)
-                ->orWhere('excerpt', 'like', $like)
-                ->orWhere('content', 'like', $like);
+    /**
+     * Pencarian toleran typo ringan (CARI-5 versi tanpa Meilisearch):
+     * pecah query jadi kata, tiap kata boleh cocok di judul/ringkasan/isi/tag.
+     */
+    public function scopeSearchSmart(Builder $query, string $q): Builder
+    {
+        $words = collect(preg_split('/\s+/', trim($q)))
+            ->filter(fn ($w) => mb_strlen($w) >= 2)
+            ->take(6)
+            ->values();
+
+        if ($words->isEmpty()) {
+            $like = '%'.$q.'%';
+
+            return $query->where(function (Builder $inner) use ($like) {
+                $inner->where('title', 'like', $like)
+                    ->orWhere('excerpt', 'like', $like)
+                    ->orWhere('content', 'like', $like);
+            });
+        }
+
+        return $query->where(function (Builder $inner) use ($words) {
+            foreach ($words as $w) {
+                $like = '%'.$w.'%';
+                $inner->where(function (Builder $sub) use ($like) {
+                    $sub->where('title', 'like', $like)
+                        ->orWhere('excerpt', 'like', $like)
+                        ->orWhere('content', 'like', $like)
+                        ->orWhereHas('tags', fn ($t) => $t->where('name', 'like', $like));
+                });
+            }
         });
     }
 
@@ -146,6 +228,6 @@ class Post extends Model
 
     public function canonicalUrl(): string
     {
-        return url('/artikel/' . $this->slug);
+        return url('/artikel/'.$this->slug);
     }
 }

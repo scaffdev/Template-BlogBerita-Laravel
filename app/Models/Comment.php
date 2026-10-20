@@ -19,6 +19,8 @@ class Comment extends Model
         'author_email',
         'content',
         'status',
+        'report_count',
+        'report_reason',
         'ip_address',
     ];
 

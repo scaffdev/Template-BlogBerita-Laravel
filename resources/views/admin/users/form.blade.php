@@ -9,6 +9,6 @@
 <label class="block">Password {{ $user->exists ? '(kosongkan bila tidak diubah)' : '' }}<input type="password" name="password" class="mt-1 w-full border rounded px-3 py-2"><input type="password" name="password_confirmation" placeholder="Konfirmasi" class="mt-1 w-full border rounded px-3 py-2"></label>
 <label class="block">Role<select name="role" class="mt-1 w-full border rounded px-3 py-2">@foreach(['reader','author','editor','admin'] as $r)<option @selected(old('role',$user->role)==$r) value="{{ $r }}">{{ ucfirst($r) }}</option>@endforeach</select></label>
 <label class="block">Bio<textarea name="bio" rows="2" class="mt-1 w-full border rounded px-3 py-2">{{ old('bio', $user->bio) }}</textarea></label>
-<button class="bg-blue-600 text-white px-4 py-2 rounded">Simpan</button>
+<button class="bg-red-600 text-white px-4 py-2 rounded">Simpan</button>
 </form>
 @endsection
