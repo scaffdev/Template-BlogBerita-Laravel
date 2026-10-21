@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
             User::firstOrCreate(['email' => $u['email']], [
                 'name' => $u['name'],
                 'username' => $u['username'],
-                'password' => Hash::make('password123'),
+                'password' => Hash::make(env('SEED_ADMIN_PASSWORD', 'ChangeMeBeforeDeploy!')),
                 'role' => $u['role'],
                 'bio' => 'Akun '.$u['role'].' BeritaKita.',
                 'email_verified_at' => now(),

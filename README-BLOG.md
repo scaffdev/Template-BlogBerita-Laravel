@@ -39,13 +39,15 @@ Saat pengembangan frontend gunakan `npm run dev` (hot reload) di terminal terpis
 - **CSP** diperbarui: CDN Tailwind/Alpine dihapus, hanya Google Fonts & GA yang diizinkan.
 - **Smoke test**: `tests/Feature/SmokeAdminPagesTest.php` menguji render 15 halaman admin + halaman frontend utama.
 
-## Akun Default (password: `password123`)
+## Akun Default (password: env `SEED_ADMIN_PASSWORD`, default `ChangeMeBeforeDeploy!`)
 | Email | Role |
 |---|---|
 | admin@berita.local | admin |
 | editor@berita.local | editor |
 | author@berita.local | author |
 | reader@berita.local | reader |
+
+> ⚠️ **WAJIB** ganti password sebelum deploy production. Set `SEED_ADMIN_PASSWORD` di `.env`.
 
 Login admin: `/admin/login` · Login publik: `/login`
 

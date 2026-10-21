@@ -9,6 +9,13 @@ use Illuminate\Http\Request;
 
 class MediaController extends Controller
 {
+    private function ensurePrivileged(): void
+    {
+        if (! in_array(auth()->user()->role, ['editor', 'admin'], true)) {
+            abort(403, 'Hanya editor dan admin yang boleh mengelola media.');
+        }
+    }
+
     public function index()
     {
         $media = Media::latest()->paginate(24);
@@ -34,6 +41,7 @@ class MediaController extends Controller
                 'alt_text' => $request->input('alt_text'),
                 'caption' => $request->input('caption'),
                 'credit' => $request->input('credit'),
+                'user_id' => auth()->id(),
             ]);
         }
 
@@ -42,6 +50,7 @@ class MediaController extends Controller
 
     public function update(Request $request, Media $medium)
     {
+        $this->ensurePrivileged();
         $data = $request->validate([
             'alt_text' => ['nullable', 'string', 'max:255'],
             'caption' => ['nullable', 'string', 'max:255'],
@@ -54,6 +63,7 @@ class MediaController extends Controller
 
     public function destroy(Media $medium, ImageService $images)
     {
+        $this->ensurePrivileged();
         $images->delete($medium->file_name);
         $medium->delete();
 

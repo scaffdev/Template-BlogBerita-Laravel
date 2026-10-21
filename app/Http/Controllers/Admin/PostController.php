@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\Redirect;
 use App\Models\Tag;
+use App\Services\ContentSanitizer;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -82,6 +83,7 @@ class PostController extends Controller
         }
         $data['user_id'] = auth()->id();
         $data['reading_time'] = $this->readingTime($data['content'] ?? '');
+        $data['content'] = app(ContentSanitizer::class)->clean($data['content'] ?? '');
 
         $tagIds = $this->resolveTagIds($request, $data);
         unset($data['tags'], $data['tags_ids']);
@@ -133,6 +135,7 @@ class PostController extends Controller
             unset($data['featured_image']);
         }
         $data['reading_time'] = $this->readingTime($data['content'] ?? $post->content);
+        $data['content'] = app(ContentSanitizer::class)->clean($data['content'] ?? $post->content);
 
         $tagIds = $this->resolveTagIds($request, $data);
         unset($data['tags'], $data['tags_ids']);
@@ -227,7 +230,7 @@ class PostController extends Controller
         $post->fill([
             'title' => $data['title'] ?: ($post->title ?? 'Tanpa judul (autosave)'),
             'slug' => $post->slug ?? Str::slug(($data['title'] ?: 'draft').'-'.Str::random(6)),
-            'content' => $data['content'] ?? $post->content ?? '',
+            'content' => app(ContentSanitizer::class)->clean($data['content'] ?? $post->content ?? ''),
             'excerpt' => $data['excerpt'] ?? $post->excerpt,
             'category_id' => $data['category_id'] ?? $post->category_id,
             'status' => 'draft',
@@ -241,7 +244,7 @@ class PostController extends Controller
     {
         $this->ensureOwnerOrPrivileged($post);
 
-        return redirect()->route('posts.show', $post->slug)->with('preview', true);
+        return redirect()->route('posts.preview', $post->id);
     }
 
     private function resolveTagIds(Request $request, array $data): ?array

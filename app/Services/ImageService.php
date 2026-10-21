@@ -52,7 +52,7 @@ class ImageService
     public function store(UploadedFile $file, string $dir = 'posts'): array
     {
         $disk = Storage::disk('public');
-        $ext = strtolower($file->getClientOriginalExtension() ?: 'jpg');
+        $ext = strtolower($file->guessExtension() ?: ($file->getClientOriginalExtension() ?: 'jpg'));
         $basename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $name = Str::slug($basename) . '-' . Str::random(8);
         $datePath = trim($dir, '/') . '/' . date('Y/m');
